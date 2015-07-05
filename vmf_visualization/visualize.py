@@ -62,26 +62,43 @@ for label in LABELS:
 fig, ax = plt.subplots()
 fig.set_size_inches(20, 20)
 
-currentNote = None
-currentLabel = None
+current_notes = []
+current_labels = []
+
 currentTick = 1
+currentPart = 0
 
 for tick in body:
-    # Deal with one part for now.
-    part = tick[0]
+    for part in tick:
+        if part[0] is 1:
+            if len(current_notes) >= (currentPart + 1):
+                try:
+                    pitches[current_labels[currentPart]].append(current_notes[currentPart])
+                except KeyError:
+                    current_labels.append(None)
+                    current_notes.append(None)
+            else:
+                current_labels.append(None)
+                current_notes.append(None)
 
-    if part[0] is 1:
-        if currentNote is not None:
-            pitches[currentLabel].append(currentNote)
+            current_labels[currentPart] = get_label(part[3], part[4])
+            current_notes[currentPart] = (currentTick, 1)
+        elif part[0] is 2:
+            current_notes[currentPart] = (current_notes[currentPart][0], current_notes[currentPart][1] + 1)
+        else:
+            if len(current_notes) >= (currentPart + 1):
+                try:
+                    pitches[current_labels[currentPart]].append(current_notes[currentPart])
+                except KeyError:
+                    current_labels.append(None)
+                    current_notes.append(None)
+            else:
+                current_labels.append(None)
+                current_notes.append(None)
 
-        currentLabel = get_label(part[3], part[4])
-        currentNote = (currentTick, 1)
-    elif part[0] is 2:
-        currentNote = (currentNote[0], currentNote[1] + 1)
-    else:
-        if currentNote is not None:
-            pitches[currentLabel].append(currentNote)
+        currentPart += 1
 
+    currentPart = 0
     currentTick += 1
 
 height = 10
@@ -90,7 +107,6 @@ for label, data in pitches.items():
     ax.broken_barh(data, (height, 10), facecolors='green')
     height += 10
 
-ax.set_xlabel('seconds since start')
 ax.set_yticks([x for x in range(10, 860, 10)])
 
 ax.set_yticklabels(LABELS)
