@@ -104,7 +104,7 @@ for tick in body:
 height = 10
 
 for label, data in pitches.items():
-    ax.broken_barh(data, (height, 10), facecolors='green')
+    ax.broken_barh(data, (height, 10), facecolors='grey')
     height += 10
 
 ax.set_yticks([x for x in range(10, 860, 10)])
@@ -112,3 +112,4 @@ ax.set_yticks([x for x in range(10, 860, 10)])
 ax.set_yticklabels(LABELS)
 
 plt.savefig('out.png')
+plt.savefig('out.eps')
